@@ -1,6 +1,7 @@
 import React from "react";
 import { useMsal } from "@azure/msal-react";
 import { EndSessionRequest, IPublicClientApplication } from "@azure/msal-browser";
+import { Button } from "semantic-ui-react";
 
 function handleRedirectLogout(instance : IPublicClientApplication) {
     const account = instance.getActiveAccount();
@@ -19,7 +20,7 @@ export const SignOutButton = () => {
 
     return (
         <div className="actions stacked">
-            <button onClick={() => handleRedirectLogout(instance)} className="button small icon solid fa-user">Sign Out Using Azure AD</button>
+            <Button color="red" onClick={() => handleRedirectLogout(instance)}>Sign Out Using Azure AD</Button>
         </div>
     );
 }

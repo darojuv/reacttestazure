@@ -2,6 +2,7 @@ import React from "react";
 import { useMsal } from "@azure/msal-react";
 import { loginRequest } from "../../auth/AuthConfig";
 import { IPublicClientApplication } from "@azure/msal-browser";
+import { Button } from "semantic-ui-react";
 
 function handleRedirectLogin(instance: IPublicClientApplication) {
     instance.loginRedirect(loginRequest).catch(e => {
@@ -15,7 +16,7 @@ export const SignInButton = () => {
 
     return (
         <div className="actions stacked">
-            <button onClick={() => handleRedirectLogin(instance)} className="button small icon solid fa-user">Sign In Using Azure AD</button>
+            <Button color="blue" onClick={() => handleRedirectLogin(instance)}>Sign In Using Azure AD</Button>
         </div>
     );
 }
