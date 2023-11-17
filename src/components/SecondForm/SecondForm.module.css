@@ -1,0 +1,6 @@
+.actionDiv {
+    width: 15%;
+    display: flex;
+    justify-content: left;
+    padding-top: 20px;
+}    
