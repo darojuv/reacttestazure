@@ -16,7 +16,7 @@ export const SignInButton = () => {
 
     return (
         <div className="actions stacked">
-            <Button color="blue" onClick={() => handleRedirectLogin(instance)}>Sign In Using Azure AD</Button>
+            <Button color="blue" onClick={() => handleRedirectLogin(instance)}>Sign In</Button>
         </div>
     );
 }

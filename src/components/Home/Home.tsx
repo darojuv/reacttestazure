@@ -2,10 +2,11 @@ import { useMsal } from "@azure/msal-react";
 import { useEffect, useState } from "react";
 import { loginRequest } from "../../auth/AuthConfig";
 import { SignOutButton } from "../SignOutButton/SignOutButton";
-import { Button, Form, Grid, Header, Input, Label } from "semantic-ui-react";
+import { Button, Container, Form, Grid, Header, Input, Label, Segment } from "semantic-ui-react";
 import { FirstForm } from "../FirstForm/FirstForm";
 import { SecondFormRowModel } from "../../models/SecondFormRowModel";
 import { SecondForm } from "../SecondForm/SecondForm";
+import styles from "../Home/Home.module.css";
 
 export const Home = () => {
     
@@ -37,20 +38,19 @@ export const Home = () => {
     
 
     return(
-        <div>
-            <Header textAlign="center">Dashboard</Header>
-            <FirstForm
-                onFirstDropDownValueSelected={(value: string) => setFirstDropDownValue(value)}
-                onSecondDropDownValueSelected={(value: string) => setSecondDropDownValue(value)}
-                onThirdDropDownValueSelected={(value: string) => setThirdDropDownValue(value)}
-                onFirstFormSubmitted={() => setFirstFormSubmitted(true)}
-            ></FirstForm>
-            <br />
-            <br />
-            <br />
-            <br />
-            <br />
-            {firstFormSubmitted && <SecondForm onSecondFormSubmitted={(formState: Array<SecondFormRowModel>) => setSecondFormState(formState)}></SecondForm>}
-        </div>
+        <Container className={styles.containerDiv}>
+            <Segment className={styles.segmentDiv}>
+                <FirstForm
+                    onFirstDropDownValueSelected={(value: string) => setFirstDropDownValue(value)}
+                    onSecondDropDownValueSelected={(value: string) => setSecondDropDownValue(value)}
+                    onThirdDropDownValueSelected={(value: string) => setThirdDropDownValue(value)}
+                    onFirstFormSubmitted={() => setFirstFormSubmitted(true)}
+                ></FirstForm>
+                <br />
+                <br />
+                <br />
+                {firstFormSubmitted && <SecondForm onSecondFormSubmitted={(formState: Array<SecondFormRowModel>) => setSecondFormState(formState)}></SecondForm>}
+            </Segment>
+        </Container>
     );
 }

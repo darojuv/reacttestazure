@@ -1,6 +1,14 @@
 .actionDiv {
-    width: 15%;
+    width: 10%;
     display: flex;
     justify-content: left;
-    padding-top: 20px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+}
+.formRow {
+    margin-top: 24px !important;
 }    
+.errorMessageSpan {
+    display: block;
+    color: red;
+}
