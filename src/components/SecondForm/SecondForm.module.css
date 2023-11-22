@@ -2,8 +2,8 @@
     width: 10%;
     display: flex;
     justify-content: left;
-    padding-top: 24px;
-    padding-bottom: 24px;
+    padding-top: 18px;
+    padding-bottom: 18px;
 }
 .formRow {
     margin-top: 24px !important;

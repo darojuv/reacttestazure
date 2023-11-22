@@ -9,17 +9,14 @@ import { SecondForm } from "../SecondForm/SecondForm";
 import styles from "../Home/Home.module.css";
 
 export const Home = () => {
-    
-    const {instance, accounts} = useMsal();
+
+    const { instance, accounts } = useMsal();
     const [accessToken, setAccessToken] = useState<string>("");
 
-    const [firstDropDownValue, setFirstDropDownValue] = useState<string>("");
-    const [secondDropDownValue, setSecondDropDownValue] = useState<string>("");
-    const [thirdDropDownValue, setThirdDropDownValue] = useState<string>("");
+    const [stateId, setStateId] = useState<number>(0);
+    const [cityId, setCityId] = useState<number>(0);
+    const [countyId, setCountyId] = useState<number>(0);
     const [firstFormSubmitted, setFirstFormSubmitted] = useState<boolean>(false);
-    const [secondFormState, setSecondFormState] = useState<Array<SecondFormRowModel>>();
-
-
 
     useEffect(() => {
         console.log("calling use effect *****");
@@ -33,23 +30,57 @@ export const Home = () => {
         }).catch((error) => {
             throw error;
         })
-    },[]);
+    }, []);
 
-    
+    const onSecondFormSubmitted = (serviceRates: Array<SecondFormRowModel>) => {
+        var requestBody = {
+            stateId: stateId,
+            cityId: cityId,
+            countyId: countyId,
+            serviceRates: serviceRates.map((serviceRate) => {
+                return {
+                    serviceRateOne: serviceRate.firstServiceRate,
+                    serviceRateOnePercentage: serviceRate.firstServiceRatePercentage,
+                    serviceRateTwo: serviceRate.secondServiceRate,
+                    serviceRateTwoPercentage: serviceRate.secondServiceRatePercentage
+                }
+            })
+        };
+        console.log("Add service rate request body : ");
+        console.log(requestBody);
+        var apiBaseUrl = "https://localhost:7021";
+        var addServiceRatesToAreaUrl = `${apiBaseUrl}/api/servicerate`;
+        fetch(addServiceRatesToAreaUrl, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        }).then((response) => {
+            console.log("Add service rate to area response : ");
+            console.log(response);
+        })
+    }
 
-    return(
+    return (
         <Container className={styles.containerDiv}>
             <Segment className={styles.segmentDiv}>
                 <FirstForm
-                    onFirstDropDownValueSelected={(value: string) => setFirstDropDownValue(value)}
-                    onSecondDropDownValueSelected={(value: string) => setSecondDropDownValue(value)}
-                    onThirdDropDownValueSelected={(value: string) => setThirdDropDownValue(value)}
-                    onFirstFormSubmitted={() => setFirstFormSubmitted(true)}
+                    onStateSelected={(value: number) => setStateId(value)}
+                    onCitySelected={(value: number) => setCityId(value)}
+                    onCountySelected={(value: number) => setCountyId(value)}
+                    onFirstFormSubmitted={(value: boolean) => setFirstFormSubmitted(value)}
                 ></FirstForm>
                 <br />
                 <br />
                 <br />
-                {firstFormSubmitted && <SecondForm onSecondFormSubmitted={(formState: Array<SecondFormRowModel>) => setSecondFormState(formState)}></SecondForm>}
+                {firstFormSubmitted &&
+                    <SecondForm
+                        stateId={stateId}
+                        cityId={cityId}
+                        countyId={countyId}
+                        onSecondFormSubmitted={(formState: Array<SecondFormRowModel>) => onSecondFormSubmitted(formState)}></SecondForm>}
             </Segment>
         </Container>
     );

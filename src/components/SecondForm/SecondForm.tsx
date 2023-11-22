@@ -5,12 +5,15 @@ import styles from "../SecondForm/SecondForm.module.css";
 
 
 export interface SecondFormProps {
+    stateId: number,
+    cityId: number,
+    countyId: number,
     onSecondFormSubmitted: (formState: Array<SecondFormRowModel>) => void
 }
 
 export const SecondForm = (props: SecondFormProps) => {
 
-    const initialState: SecondFormRowModel = {
+    const initialFormState: SecondFormRowModel = {
         firstServiceRate: 0,
         firstServiceRatePercentage: 0,
         secondServiceRate: 0,
@@ -28,9 +31,55 @@ export const SecondForm = (props: SecondFormProps) => {
         isSecondServiceRatePercentageTouched: false
     }
 
-    const [formState, setFormState] = useState<Array<SecondFormRowModel>>([initialState]);
-    const [formErrorState, setFormErrorState] = useState<Array<SecondFormRowErrorModel>>([initialErrorState]);
+    const [formState, setFormState] = useState<Array<SecondFormRowModel>>([]);
+    const [formErrorState, setFormErrorState] = useState<Array<SecondFormRowErrorModel>>([]);
     const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
+
+    useEffect(() => {
+        const getServiceRatesForArea = async () => {
+            var apiBaseUrl = "https://localhost:7021";
+            var getServiceRatesApiUrl: string = `${apiBaseUrl}/api/ServiceRate?StateId=${props.stateId}&CityId=${props.cityId}&CountyId=${props.countyId}`;
+            var response = await fetch(getServiceRatesApiUrl);
+            var serviceRates = await response.json() as Array<any>;
+            var formStateArray: Array<SecondFormRowModel> = [];
+            serviceRates.forEach(serviceRate => {
+                var formStateEntry: SecondFormRowModel = {
+                    firstServiceRate: serviceRate.serviceRateOne,
+                    firstServiceRatePercentage: serviceRate.serviceRateOnePercentage,
+                    secondServiceRate: serviceRate.serviceRateTwo,
+                    secondServiceRatePercentage: serviceRate.serviceRateTwoPercentage
+                };
+                formStateArray.push(formStateEntry);
+            });
+            return formStateArray;
+        }
+
+        getServiceRatesForArea().then((serviceRates: Array<SecondFormRowModel>) => {
+            if (serviceRates.length == 0) {
+                setFormState([initialFormState])
+                setFormErrorState([initialErrorState])
+            }
+            else {
+                setFormState(serviceRates);
+                var formErrorState: Array<SecondFormRowErrorModel> = [];
+                serviceRates.forEach(serviceRate => {
+                    var newErrorState: SecondFormRowErrorModel = {
+                        isFirstServiceRateError: false,
+                        isFirstServiceRateTouched: false,
+                        isFirstServiceRatePercentageError: false,
+                        isFirstServiceRatePercentageTouched: false,
+                        isSecondServiceRateError: false,
+                        isSecondServiceRateTouched: false,
+                        isSecondServiceRatePercentageError: false,
+                        isSecondServiceRatePercentageTouched: false
+                    }
+                    formErrorState.push(newErrorState);
+                });
+                setFormErrorState(formErrorState)
+            }
+        });
+
+    }, []);
 
     const onFormSubmit = () => {
         console.log("Second form submitted");
@@ -47,10 +96,26 @@ export const SecondForm = (props: SecondFormProps) => {
     const onAddRowButtonClick = () => {
         console.log("Add row button clicked");
         var newState = [...formState];
-        newState.push(initialState);
+        var newStateRecord: SecondFormRowModel = {
+            firstServiceRate: 0,
+            firstServiceRatePercentage: 0,
+            secondServiceRate: 0,
+            secondServiceRatePercentage: 0
+        }
+        newState.push(newStateRecord);
         setFormState(newState);
         var newErrorState = [...formErrorState];
-        newErrorState.push(initialErrorState);
+        var newErrorStateRecord: SecondFormRowErrorModel = {
+            isFirstServiceRateError: false,
+            isFirstServiceRateTouched: false,
+            isFirstServiceRatePercentageError: false,
+            isFirstServiceRatePercentageTouched: false,
+            isSecondServiceRateError: false,
+            isSecondServiceRateTouched: false,
+            isSecondServiceRatePercentageError: false,
+            isSecondServiceRatePercentageTouched: false
+        }
+        newErrorState.push(newErrorStateRecord);
         setFormErrorState(newErrorState);
     }
 
@@ -72,8 +137,8 @@ export const SecondForm = (props: SecondFormProps) => {
         newState[index].firstServiceRate = intValue;
         setFormState(newState);
         var newErrorState = [...formErrorState];
-        newErrorState[index].isFirstServiceRateError = (intValue < 0);
-        newErrorState[index].isFirstServiceRateTouched = (intValue < 0);
+        newErrorState[index].isFirstServiceRateError = (intValue < 0 || isNaN(intValue));
+        newErrorState[index].isFirstServiceRateTouched = (intValue < 0 || isNaN(intValue));
         setFormErrorState(newErrorState);
 
     }
@@ -84,8 +149,8 @@ export const SecondForm = (props: SecondFormProps) => {
         newState[index].firstServiceRatePercentage = intValue;
         setFormState(newState);
         var newErrorState = [...formErrorState];
-        newErrorState[index].isFirstServiceRatePercentageError = (intValue < 0 || intValue > 100);
-        newErrorState[index].isFirstServiceRatePercentageTouched = (intValue < 0 || intValue > 100);
+        newErrorState[index].isFirstServiceRatePercentageError = (intValue < 0 || isNaN(intValue) || intValue > 100);
+        newErrorState[index].isFirstServiceRatePercentageTouched = (intValue < 0 || isNaN(intValue) || intValue > 100);
         setFormErrorState(newErrorState);
     }
     const onSecondServiceRateChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,8 +160,8 @@ export const SecondForm = (props: SecondFormProps) => {
         newState[index].secondServiceRate = intValue;
         setFormState(newState);
         var newErrorState = [...formErrorState];
-        newErrorState[index].isSecondServiceRateError = (intValue < 0);
-        newErrorState[index].isSecondServiceRateTouched = (intValue < 0);
+        newErrorState[index].isSecondServiceRateError = (intValue < 0 || isNaN(intValue));
+        newErrorState[index].isSecondServiceRateTouched = (intValue < 0 || isNaN(intValue));
         setFormErrorState(newErrorState);
     }
     const onSecondServiceRatePercentageChange = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,8 +171,8 @@ export const SecondForm = (props: SecondFormProps) => {
         newState[index].secondServiceRatePercentage = intValue;
         setFormState(newState);
         var newErrorState = [...formErrorState];
-        newErrorState[index].isSecondServiceRatePercentageError = (intValue < 0 || intValue > 100);
-        newErrorState[index].isSecondServiceRatePercentageTouched = (intValue < 0 || intValue > 100);
+        newErrorState[index].isSecondServiceRatePercentageError = (intValue < 0 || isNaN(intValue) || intValue > 100);
+        newErrorState[index].isSecondServiceRatePercentageTouched = (intValue < 0 || isNaN(intValue) || intValue > 100);
         setFormErrorState(newErrorState);
     }
 
@@ -171,12 +236,12 @@ export const SecondForm = (props: SecondFormProps) => {
                                 </div>
                                 {formState.length > 1 &&
                                     <div className={styles.actionDiv}>
-                                        <Button color="red" onClick={() => onDeleteRowButtonClick(index)}>Delete</Button>
+                                        <Button type="button" color="red" onClick={() => onDeleteRowButtonClick(index)}>Delete</Button>
                                     </div>
                                 }
                                 {index == formState.length - 1 &&
                                     <div className={styles.actionDiv}>
-                                        <Button color="green" onClick={() => onAddRowButtonClick()}>Add</Button>
+                                        <Button type="button" color="green" onClick={() => onAddRowButtonClick()}>Add</Button>
                                     </div>
                                 }
                             </Grid>
